@@ -1,4 +1,7 @@
-# Jami Android
+# Portalissimo
+
+Fork expérimental de Jami Android pour Portal TV sous Android 9.
+Voir [la compilation et les limites de cette version](PORTAL-TV.md).
 
 The Jami client for Android
 

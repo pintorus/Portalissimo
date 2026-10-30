@@ -16,12 +16,12 @@ plugins {
 
 android {
     namespace = "cx.ring"
-    compileSdk = 37
-    buildToolsVersion = "37.0.0"
-    ndkVersion = "29.0.14206865"
+    compileSdk = 36
+    buildToolsVersion = "36.0.0"
+    ndkVersion = "28.2.13676358"
     defaultConfig {
         minSdk = 26
-        targetSdk = 37
+        targetSdk = 36
         versionCode = 506
         versionName = "20261023-01"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -265,5 +265,8 @@ if (buildFirebase) {
 // Make sure the native build runs before the Kotlin/Java build
 afterEvaluate {
     val cmakeTasks = tasks.matching { it.name.startsWith("buildCMake") }
-    tasks.withType<KotlinCompile>().configureEach { dependsOn(cmakeTasks) }
+    tasks.withType<KotlinCompile>().configureEach {
+        val nativeBuildType = if (name.contains("Release")) "RelWithDebInfo" else "Debug"
+        dependsOn(cmakeTasks.matching { it.name.startsWith("buildCMake$nativeBuildType") })
+    }
 }

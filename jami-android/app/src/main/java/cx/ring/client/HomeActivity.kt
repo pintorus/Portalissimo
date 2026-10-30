@@ -256,13 +256,13 @@ class HomeActivity : AppCompatActivity(), ContactPickerFragment.OnContactedPicke
     }
 
     private fun checkLocalNetworkPermission() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.CINNAMON_BUN) {
+        if (Build.VERSION.SDK_INT < 37) {
             checkPostNotificationsPermission()
             return
         }
         if (localNetworkPermissionPromptShown) return
         val granted = ContextCompat.checkSelfPermission(
-            this, Manifest.permission.ACCESS_LOCAL_NETWORK
+            this, "android.permission.ACCESS_LOCAL_NETWORK"
         ) == PackageManager.PERMISSION_GRANTED
         if (granted) {
             checkPostNotificationsPermission()
@@ -272,13 +272,13 @@ class HomeActivity : AppCompatActivity(), ContactPickerFragment.OnContactedPicke
         val prefs = getSharedPreferences(PREFS_LOCAL_NETWORK_PERM, Context.MODE_PRIVATE)
         val askedOnce = prefs.getBoolean(PREF_LOCAL_NETWORK_PERM_ASKED, false)
         val showRationale = ActivityCompat.shouldShowRequestPermissionRationale(
-            this, Manifest.permission.ACCESS_LOCAL_NETWORK
+            this, "android.permission.ACCESS_LOCAL_NETWORK"
         )
 
         when {
             !askedOnce && !showRationale -> {
                 localNetworkPermissionPromptShown = true
-                localNetworkPermissionLauncher.launch(Manifest.permission.ACCESS_LOCAL_NETWORK)
+                localNetworkPermissionLauncher.launch("android.permission.ACCESS_LOCAL_NETWORK")
             }
             showRationale -> {
                 localNetworkPermissionPromptShown = true
@@ -289,7 +289,7 @@ class HomeActivity : AppCompatActivity(), ContactPickerFragment.OnContactedPicke
                         checkPostNotificationsPermission()
                     }
                     .setPositiveButton(android.R.string.ok) { _, _ ->
-                        localNetworkPermissionLauncher.launch(Manifest.permission.ACCESS_LOCAL_NETWORK)
+                        localNetworkPermissionLauncher.launch("android.permission.ACCESS_LOCAL_NETWORK")
                     }
                     .show()
             }
