@@ -37,6 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="com.facebook.portal.permission.SMART_CAMERA_CONTROL" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT"
         tools:ignore="FullScreenIntentPolicy" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -93,6 +94,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <uses-feature
         android:name="android.hardware.type.pc"
         android:required="false" />
+
+    <queries>
+        <package android:name="com.facebook.portal.aiservice" />
+    </queries>
 
     <application
         android:appCategory="social"

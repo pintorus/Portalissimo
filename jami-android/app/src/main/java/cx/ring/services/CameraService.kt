@@ -60,6 +60,7 @@ import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.abs
 
 class CameraService internal constructor(c: Context) {
+    private val context = c.applicationContext
     private val manager = c.getSystemService(Context.CAMERA_SERVICE) as CameraManager?
     private val mParams = HashMap<String, VideoParams>()
     private val mNativeParams: MutableMap<String, DeviceParams> = HashMap()
@@ -272,6 +273,7 @@ class CameraService internal constructor(c: Context) {
         val sessionGeneration = AtomicLong()
         val operationGeneration = AtomicLong()
         var codecStartInProgress = false
+        internal var smartCamera: PortalSmartCamera? = null
 
         fun getAndroidCodec() = when (val codec = codec) {
             "H264" -> MediaFormat.MIMETYPE_VIDEO_AVC
@@ -369,6 +371,8 @@ class CameraService internal constructor(c: Context) {
     }
 
     private fun releaseCapturePipeline(params: VideoParams) {
+        params.smartCamera?.close()
+        params.smartCamera = null
         params.mediaCodec?.let { codec ->
             try {
                 if (params.codecStarted)
@@ -857,6 +861,10 @@ class CameraService internal constructor(c: Context) {
                                 null,
                             handler
                         )
+                        if (videoParams.smartCamera == null) {
+                            videoParams.smartCamera = PortalSmartCamera.create(context, videoExecutor)
+                                ?.also { it.start() }
+                        }
                         listener.onOpened()
                     } catch (e: Exception) {
                         Log.e(TAG, "Failed to set repeating request", e)

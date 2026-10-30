@@ -1,111 +1,89 @@
 # Portalissimo
 
-Fork expérimental de Jami Android pour Portal TV sous Android 9.
-Voir [la compilation et les limites de cette version](PORTAL-TV.md).
+English | [Français](README_FR.md)
 
-The Jami client for Android
+Portalissimo is an experimental fork of [Jami for Android](https://github.com/savoirfairelinux/jami-client-android) for **Meta Portal TV running Android 9**. It keeps Jami's calling engine and TV interface, with automatic camera framing through Meta's Smart Camera SDK when the device allows access.
 
-| App | CI
-| :-: | :-: |
-| [![Download on the Play Store](https://img.shields.io/badge/download-play%20store-blue.svg)](https://play.google.com/store/apps/details?id=cx.ring) [![Download on F-Droid](https://img.shields.io/badge/download-fdroid-blue.svg)](https://f-droid.org/repository/browse/?fdid=cx.ring) | [![Build Status](https://jenkins.jami.net/buildStatus/icon?job=client-android)](https://jenkins.jami.net/job/client-android/)
+This is an independent project, not an official Meta or Jami distribution.
 
-## Environment
+## Features and current status
 
-### Submodule
+- Jami video calls and conferencing, with a TV interface.
+- Smart Camera `DefaultAuto` mode during Camera2 preview and video capture.
+- Standard camera capture remains available if the Meta service is absent, denies access or disconnects.
+- Camera control is released when capture stops or is reconfigured.
+- A `noPush` build variant without Google push services.
 
-Download the project including the daemon submodule with:
+The base application was installed and its TV account wizard opened on a Portal TV running Android 9 (API 28). The Smart Camera integration builds successfully and has unit tests, but **actual automatic framing and end-to-end calls still need testing on the device**. Other Smart Camera modes are not exposed.
 
-```sh
-git clone --recursive https://review.jami.net/jami-client-android
-```
+## Build
 
-Or to download the daemon submodule from the existing project directory:
+Requirements:
 
-```sh
-git submodule update --init --recursive
-```
+- Full JDK 21, including `javac`.
+- Android SDK 36, Build Tools 36.0.0, NDK 28.2.13676358 and CMake 4.1.2.
+- SWIG 4.2 or newer, Autoconf, Automake, Autopoint, Libtool, Gettext, Meson, Yasm, Ninja, M4, pkg-config and a native build toolchain.
+- Rust with `rustup`; the native build installs the required Android targets.
+- Node.js 24 and npm for Jami's bundled collaborative editor.
 
-### Dependencies
-
-Make sure to have autotools, autopoint, swig, yasm, m4, ninja-build and cmake available on your system.
-
-> [!WARNING]
->
-> Jami needs at least swig 4.2 to work. Else it will raise errors at compilation.
-> See if the package is available with this version from your package manager, else you will need to install it [from sources](https://github.com/swig/swig).
-
-##### On Debian/Ubuntu
+Configure `JAVA_HOME` and `ANDROID_HOME` for your installations and put the tools on `PATH`. Then:
 
 ```sh
-apt install cmake build-essential swig yasm ninja-build m4 autotools-dev autopoint libtool
+git clone --recurse-submodules --branch portal-tv https://github.com/pintorus/Portalissimo.git
+cd Portalissimo
+cd daemon/bin/jni
+PACKAGEDIR="$PWD/../../../jami-android/libjamiclient/src/main/java" bash ./make-swig.sh
+cd ../../../jami-android
+./gradlew :app:assembleNoPushDebug -Parchs=arm64-v8a
 ```
 
-##### On Arch
+For an existing checkout, run `git submodule update --init --recursive` before generating the JNI bindings. You can also open `jami-android` in Android Studio after configuring the dependencies.
+
+The ARM64 APK is generated at:
+
+```text
+jami-android/app/build/outputs/apk/noPush/debug/app-noPush-debug.apk
+```
+
+The minimum Android API is 26, which includes Android 9/API 28. Compiling with SDK 36 does not upgrade the Portal's operating system.
+
+## Tests
+
+From `jami-android`:
 
 ```sh
-pacman -S cmake ninja automake swig yasm m4 patch autoconf pkgconf
+./gradlew :app:testNoPushDebugUnitTest -Parchs=arm64-v8a
 ```
 
-##### On macOS:
+Validation performed: 14 JVM tests and 64 collaborative-editor JavaScript tests passed, and the ARM64 debug APK built successfully. The Smart Camera tests cover availability, permission failures, late callbacks, disconnections and resource cleanup.
+
+## Install on Portal TV
+
+Enable USB debugging and identify the Portal TV serial with `adb devices`. From `jami-android`, replace `PORTAL_SERIAL` with that serial:
 
 ```sh
-brew install cmake automake autotools libtool pkg-config rustup yasm swig
-"$(brew --prefix rustup)/bin/rustup" default 1.97.1
+adb -s PORTAL_SERIAL install -r app/build/outputs/apk/noPush/debug/app-noPush-debug.apk
+adb -s PORTAL_SERIAL shell pm grant cx.ring android.permission.CAMERA
+adb -s PORTAL_SERIAL shell pm grant cx.ring android.permission.RECORD_AUDIO
+adb -s PORTAL_SERIAL shell am start -W -n cx.ring/.tv.main.HomeActivity
 ```
 
-The Rust toolchain is required by the yffi collaborative-editing dependency.
-Its Android targets are installed automatically when the dependency is built.
+The package ID remains `cx.ring`. This debug build uses a local debug signing key and cannot replace an existing Jami installation signed with another key. Back up your accounts before removing an existing installation: uninstalling deletes its local accounts and data.
 
-When using brew on macOS, the 'libtoolize' binary might be available as 'glibtoolize'.
-In that case, the following command makes it avaialble to the build system:
+## Smart Camera
+
+The integration uses `com.facebook.portal:smartcamera:1.4.0` and requests `com.facebook.portal.permission.SMART_CAMERA_CONTROL`. It activates `DefaultAuto` only when Meta's `com.facebook.portal.aiservice` service is present and grants control. Declaring the permission does not guarantee that a particular Portal firmware will grant it.
+
+To inspect activation and fallback messages:
 
 ```sh
-ln -s /opt/homebrew/bin/glibtoolize /opt/homebrew/bin/libtoolize
+adb -s PORTAL_SERIAL logcat -s PortalSmartCamera
 ```
 
-### Android SDK & NDK
+Further technical notes in French: [Portal TV build and installation](PORTAL-TV.md) and [Smart Camera SDK research and limitations](SMART-CAMERA.md). Meta's [SDK samples](https://github.com/fbsamples/portal-sdk-samples) provide the upstream usage examples.
 
-Make sure to have the Android SDK and NDK available.
+## Upstream and license
 
-## Build instructions
+Portalissimo is based on Jami by Savoir-faire Linux and its contributors. The Jami code is distributed under GPL-3.0-or-later; see [COPYING](COPYING). Third-party dependencies retain their respective licenses.
 
-### With Android Studio:
-
-* Add 'jami-android' in Android Studio
-* Click on build
-* Enjoy!
-
-### With the command line:
-
-```sh
-cd jami-client-android/jami-android
-./gradlew assembleDebug
-```
-
-### Troubleshoot
-
-Jami Android doesn't use the system's `pkg-config`; it builds its own version with custom parameters to support cross-compilation. However, after cleaning the project, `pkg-config` may not be rebuilt, which could result in falling back to the system's version, leading to errors when attempting to locate shared libraries.
-
-```sh
-cd jami-client-android/daemon/extras/tools
-./bootstrap && make .pkg-config
-```
-
-## Update translations
-
-Update translations using the Transifex client (tx) :
-```sh
-./update-translations.sh
-```
-
-## Generate new release commit
-
-Generate a new release commit updating the version code and version string:
-```sh
-./update_version.py --commit
-```
-
-## Report issues
-
-Report issues on Gitlab:
-https://git.jami.net/savoirfairelinux/jami-client-android
+Report fork-specific problems in [Portalissimo issues](https://github.com/pintorus/Portalissimo/issues). The [upstream Jami project](https://git.jami.net/savoirfairelinux/jami-client-android) remains the source for Jami development.

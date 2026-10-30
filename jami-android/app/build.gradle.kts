@@ -154,6 +154,8 @@ dependencies {
     implementation(project(":libjamiclient"))
     implementation(libs.kotlin.stdlib)
     testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
+    implementation("com.facebook.portal:smartcamera:1.4.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
