@@ -6,10 +6,12 @@ Portalissimo est un fork expérimental de [Jami pour Android](https://github.com
 
 Il s'agit d'un projet indépendant, et non d'une distribution officielle de Meta ou de Jami.
 
+Téléchargement : [Portalissimo 1.0 — APK ARM64](https://github.com/pintorus/Portalissimo/releases/tag/v1.0). Cette version utilise la même clé de signature debug locale que les versions de développement.
+
 ## Fonctionnalités et état actuel
 
 - Appels vidéo et visioconférences Jami, avec une interface TV.
-- Suivi du sujet Smart Camera `BasicSpotlight` pendant la prévisualisation et la capture vidéo Camera2, avec repli sur `DefaultAuto` si le mode est refusé. Le centrage sur le visage dépend du firmware et reste à valider visuellement.
+- Suivi du sujet Smart Camera `BasicSpotlight` pendant la prévisualisation et la capture vidéo Camera2, avec repli sur `DefaultAuto` si le mode est refusé. Le cadrage a été jugé bon par l’utilisateur sur son Portal TV ; le résultat dépend du firmware.
 - Capture standard conservée si le service Meta est absent, refuse l'accès ou se déconnecte.
 - Contrôle de la caméra libéré à l'arrêt ou à la reconfiguration de la capture.
 - Variante `noPush` sans les services de notifications Google.
