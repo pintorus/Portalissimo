@@ -67,14 +67,20 @@ internal class PortalSmartCamera(
         try {
             val acquired = requireNotNull(connection?.requestControls())
             session = acquired
-            acquired.setMode(ModeSpec.DefaultAuto.create())
+            try {
+                acquired.setMode(ModeSpec.BasicSpotlight.create())
+                Log.i(TAG, "Smart Camera subject tracking enabled (BasicSpotlight)")
+            } catch (e: Exception) {
+                Log.w(TAG, "Subject tracking unavailable; trying DefaultAuto", e)
+                acquired.setMode(ModeSpec.DefaultAuto.create())
+                Log.i(TAG, "Smart Camera automatic framing enabled (DefaultAuto)")
+            }
             acquired.closeFuture.addListener({
                 if (session === acquired) {
                     session = null
                     Log.i(TAG, "Smart Camera control revoked; keeping standard camera")
                 }
             }, executor)
-            Log.i(TAG, "Smart Camera automatic framing enabled")
         } catch (e: Exception) {
             fallback(e)
         }

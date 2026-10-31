@@ -9,12 +9,12 @@ This is an independent project, not an official Meta or Jami distribution.
 ## Features and current status
 
 - Jami video calls and conferencing, with a TV interface.
-- Smart Camera `DefaultAuto` mode during Camera2 preview and video capture.
+- Smart Camera `BasicSpotlight` subject tracking during Camera2 preview and video capture, with `DefaultAuto` fallback if the mode is rejected. Face-centered framing remains dependent on the firmware and requires visual validation.
 - Standard camera capture remains available if the Meta service is absent, denies access or disconnects.
 - Camera control is released when capture stops or is reconfigured.
 - A `noPush` build variant without Google push services.
 
-The base application was installed and its TV account wizard opened on a Portal TV running Android 9 (API 28). The Smart Camera integration builds successfully and has unit tests, but **actual automatic framing and end-to-end calls still need testing on the device**. Other Smart Camera modes are not exposed.
+The base application was installed and its TV account wizard opened on a Portal TV running Android 9 (API 28). The Smart Camera integration builds successfully and has unit tests, but **actual automatic framing and end-to-end calls still need testing on the device**. No manual mode selector is exposed.
 
 ## Build
 
@@ -55,7 +55,7 @@ From `jami-android`:
 ./gradlew :app:testNoPushDebugUnitTest -Parchs=arm64-v8a
 ```
 
-Validation performed: 14 JVM tests and 64 collaborative-editor JavaScript tests passed, and the ARM64 debug APK built successfully. The Smart Camera tests cover availability, permission failures, late callbacks, disconnections and resource cleanup.
+Validation performed: 15 JVM tests and 64 collaborative-editor JavaScript tests passed, and the ARM64 debug APK built successfully. The Smart Camera tests cover availability, permission failures, late callbacks, disconnections and resource cleanup.
 
 ## Install on Portal TV
 
@@ -72,7 +72,7 @@ The package ID remains `cx.ring`. This debug build uses a local debug signing ke
 
 ## Smart Camera
 
-The integration uses `com.facebook.portal:smartcamera:1.4.0` and requests `com.facebook.portal.permission.SMART_CAMERA_CONTROL`. It activates `DefaultAuto` only when Meta's `com.facebook.portal.aiservice` service is present and grants control. Declaring the permission does not guarantee that a particular Portal firmware will grant it.
+The integration uses `com.facebook.portal:smartcamera:1.4.0` and requests `com.facebook.portal.permission.SMART_CAMERA_CONTROL`. It requests `BasicSpotlight`, with `DefaultAuto` fallback, only when Meta's `com.facebook.portal.aiservice` service is present and grants control. Declaring the permission does not guarantee that a particular Portal firmware will grant it.
 
 To inspect activation and fallback messages:
 

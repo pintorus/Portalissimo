@@ -9,12 +9,12 @@ Il s'agit d'un projet indépendant, et non d'une distribution officielle de Meta
 ## Fonctionnalités et état actuel
 
 - Appels vidéo et visioconférences Jami, avec une interface TV.
-- Mode Smart Camera `DefaultAuto` pendant la prévisualisation et la capture vidéo Camera2.
+- Suivi du sujet Smart Camera `BasicSpotlight` pendant la prévisualisation et la capture vidéo Camera2, avec repli sur `DefaultAuto` si le mode est refusé. Le centrage sur le visage dépend du firmware et reste à valider visuellement.
 - Capture standard conservée si le service Meta est absent, refuse l'accès ou se déconnecte.
 - Contrôle de la caméra libéré à l'arrêt ou à la reconfiguration de la capture.
 - Variante `noPush` sans les services de notifications Google.
 
-L'application de base a été installée et son assistant de compte TV ouvert sur un Portal TV sous Android 9 (API 28). L'intégration Smart Camera compile et dispose de tests unitaires, mais **le cadrage automatique réel et les appels de bout en bout restent à tester sur l'appareil**. Les autres modes Smart Camera ne sont pas exposés.
+L'application de base a été installée et son assistant de compte TV ouvert sur un Portal TV sous Android 9 (API 28). L'intégration Smart Camera compile et dispose de tests unitaires, mais **le cadrage automatique réel et les appels de bout en bout restent à tester sur l'appareil**. Aucun sélecteur manuel de mode n’est exposé.
 
 ## Compilation
 
@@ -55,7 +55,7 @@ Depuis `jami-android` :
 ./gradlew :app:testNoPushDebugUnitTest -Parchs=arm64-v8a
 ```
 
-Validation effectuée : 14 tests JVM et 64 tests JavaScript de l'éditeur collaboratif réussis, et compilation de l'APK debug ARM64 réussie. Les tests Smart Camera couvrent la disponibilité, les refus de permission, les rappels tardifs, les déconnexions et la libération des ressources.
+Validation effectuée : 15 tests JVM et 64 tests JavaScript de l'éditeur collaboratif réussis, et compilation de l'APK debug ARM64 réussie. Les tests Smart Camera couvrent la disponibilité, les refus de permission, les rappels tardifs, les déconnexions et la libération des ressources.
 
 ## Installation sur Portal TV
 
@@ -72,7 +72,7 @@ L'identifiant du paquet reste `cx.ring`. Cette version debug utilise une clé de
 
 ## Smart Camera
 
-L'intégration utilise `com.facebook.portal:smartcamera:1.4.0` et demande `com.facebook.portal.permission.SMART_CAMERA_CONTROL`. Elle active `DefaultAuto` uniquement si le service Meta `com.facebook.portal.aiservice` est présent et accorde le contrôle. Déclarer la permission ne garantit pas que le firmware du Portal l'accordera.
+L'intégration utilise `com.facebook.portal:smartcamera:1.4.0` et demande `com.facebook.portal.permission.SMART_CAMERA_CONTROL`. Elle demande `BasicSpotlight`, avec repli sur `DefaultAuto`, uniquement si le service Meta `com.facebook.portal.aiservice` est présent et accorde le contrôle. Déclarer la permission ne garantit pas que le firmware du Portal l'accordera.
 
 Pour consulter les messages d'activation et de retour à la capture standard :
 

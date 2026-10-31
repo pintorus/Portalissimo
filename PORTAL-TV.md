@@ -52,7 +52,7 @@ Les appels audio/vidéo et le cadrage intelligent ne sont pas encore validés.
 
 ## Caméra intelligente
 
-Le SDK `com.facebook.portal:smartcamera:1.4.0` active `DefaultAuto` pendant la
+Le SDK `com.facebook.portal:smartcamera:1.4.0` demande `BasicSpotlight` (suivi du sujet), avec repli sur `DefaultAuto` si refusé, pendant la
 prévisualisation et la capture vidéo Camera2. Le contrôle est libéré lorsque la
 caméra est arrêtée, reconfigurée ou déconnectée. La permission spécifique demandée
 est `com.facebook.portal.permission.SMART_CAMERA_CONTROL`.

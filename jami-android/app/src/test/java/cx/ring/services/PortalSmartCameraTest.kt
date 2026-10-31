@@ -35,7 +35,7 @@ class PortalSmartCameraTest {
     }
 
     @Test
-    fun enablesAutomaticFramingOnlyWhenControlBecomesAvailable() {
+    fun enablesSubjectTrackingOnlyWhenControlBecomesAvailable() {
         val f = Fixture(initialAvailability = false)
         f.controller.start()
         f.connected.set(f.connection)
@@ -45,7 +45,27 @@ class PortalSmartCameraTest {
 
         val mode = ArgumentCaptor.forClass(ModeSpec::class.java)
         verify(f.session).setMode(mode.capture())
-        assertTrue(mode.value is ModeSpec.DefaultAuto)
+        assertTrue(mode.value is ModeSpec.BasicSpotlight)
+        f.controller.close()
+    }
+
+    @Test
+    fun fallsBackToAutomaticFramingWhenSpotlightIsRejected() {
+        val f = Fixture()
+        doAnswer { invocation ->
+            if (invocation.getArgument<ModeSpec>(0) is ModeSpec.BasicSpotlight)
+                throw UnsupportedOperationException("Spotlight unavailable")
+            null
+        }.`when`(f.session).setMode(any())
+        f.controller.start()
+
+        f.connected.set(f.connection)
+
+        val modes = ArgumentCaptor.forClass(ModeSpec::class.java)
+        verify(f.session, times(2)).setMode(modes.capture())
+        assertTrue(modes.allValues[0] is ModeSpec.BasicSpotlight)
+        assertTrue(modes.allValues[1] is ModeSpec.DefaultAuto)
+        verify(f.session, never()).close()
         f.controller.close()
     }
 

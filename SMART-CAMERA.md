@@ -45,7 +45,7 @@ indique encore un binaire en attente pour `smartcamera:1.1.+`. Cela ne décrit p
 la disponibilité de l'ancien artefact 1.4.0, vérifiée directement dans Maven
 Central et dans l'exemple officiel.
 
-Le SDK est intégré au cycle Camera2 du fork avec le mode `DefaultAuto` et retour
+Le SDK est intégré au cycle Camera2 du fork avec le mode `BasicSpotlight`, repli sur `DefaultAuto` si refusé et retour
 à la capture standard si le contrôle échoue. Restent à vérifier sur le Portal TV :
 présence et version du service, autorisation des permissions pour notre APK,
 application effective des modes au flux envoyé par Jami et libération du contrôle
